@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+from re import X
 from typing import Iterable, Optional, Sequence, Tuple, Union
 
 import numba
@@ -73,27 +74,6 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
         ordinal //= shape[i]
         #REVIEW MATH
 
-'''
-    dim = len(shape)
-    print(dim, ordinal)
-
-    if dim == 1 or dim == 0:
-        out_index[0] = ordinal
-        print("short 1")
-        return
-    else:
-        for i in range(dim - 1, -1, -1):
-            
-            if i == 0:
-                out_index[i] = ordinal
-                print("short 2")
-                return
-            else:
-                out_index[i] = ordinal // shape[i]
-                ordinal = ordinal % shape[i]
-                print("cycle")
-'''
-
 def broadcast_index(
     big_index: Index, big_shape: Shape, shape: Shape, out_index: OutIndex
 ) -> None:
@@ -115,8 +95,15 @@ def broadcast_index(
         None
 
     """
+    for i in range(len(shape)):
+        if big_shape[i] == shape[i]:
+            out_index[i] = big_index[i]
+        elif big_shape[i] == 1:
+            out_index[i] = 0
+        else:
+            raise IndexingError(f"Cannot broadcast index {big_index} from shape {big_shape} to shape {shape}")
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    #raise NotImplementedError("Need to implement for Task 2.2")
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -136,8 +123,20 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         IndexingError : if cannot broadcast
 
     """
+    max_len = max(len(shape1), len(shape2))
+    shape1 = (1,) * (max_len - len(shape1)) + tuple(shape1) #left pads w 1s
+    shape2 = (1,) * (max_len - len(shape2)) + tuple(shape2)
+
+    result_shape = []
+
+    for i in range(max_len):
+        dim1, dim2 = shape1[i], shape2[i]
+        if dim1 == dim2 or dim1 == 1 or dim2 == 1:
+            result_shape.append(max(dim1, dim2))
+        else:
+            raise IndexingError(f"Shapes {shape1} and {shape2} cannot be broadcasted")
+    return tuple(result_shape)
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
