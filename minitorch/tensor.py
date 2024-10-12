@@ -16,7 +16,7 @@ from .tensor_functions import (
     Copy,
     Inv,
     MatMul,
-    Mul,
+    # Mul,
 )
 
 if TYPE_CHECKING:

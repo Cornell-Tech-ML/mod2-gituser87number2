@@ -46,8 +46,11 @@ def index_to_position(index: Index, strides: Strides) -> int:
         Position in storage
 
     """
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
+    size = len(index)
+    sum = 0
+    for i in range(size):
+        sum += index[i] * strides[i]
+    return sum
 
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
@@ -63,9 +66,33 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
         out_index : return index corresponding to position.
 
     """
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
+    dim = len(shape)
 
+    for i in range(dim - 1, -1, -1):
+        out_index[i] = ordinal % shape[i]
+        ordinal //= shape[i]
+        #REVIEW MATH
+
+'''
+    dim = len(shape)
+    print(dim, ordinal)
+
+    if dim == 1 or dim == 0:
+        out_index[0] = ordinal
+        print("short 1")
+        return
+    else:
+        for i in range(dim - 1, -1, -1):
+            
+            if i == 0:
+                out_index[i] = ordinal
+                print("short 2")
+                return
+            else:
+                out_index[i] = ordinal // shape[i]
+                ordinal = ordinal % shape[i]
+                print("cycle")
+'''
 
 def broadcast_index(
     big_index: Index, big_shape: Shape, shape: Shape, out_index: OutIndex
@@ -153,7 +180,7 @@ class TensorData:
         self._shape = array(shape)
         self.strides = strides
         self.dims = len(strides)
-        self.size = int(prod(shape))
+        self.size = int(prod(shape)) #wrong prod referenced?
         self.shape = shape
         assert len(self._storage) == self.size
 
@@ -179,9 +206,11 @@ class TensorData:
 
     @staticmethod
     def shape_broadcast(shape_a: UserShape, shape_b: UserShape) -> UserShape:
+        """Broadcast two shapes to create a new union shape."""
         return shape_broadcast(shape_a, shape_b)
 
     def index(self, index: Union[int, UserIndex]) -> int:
+        """Converts a multidimensional tensor `index` into a single-dimensional position in storage based on strides."""
         if isinstance(index, int):
             aindex: Index = array([index])
         else:  # if isinstance(index, tuple):
@@ -205,6 +234,7 @@ class TensorData:
         return index_to_position(array(index), self._strides)
 
     def indices(self) -> Iterable[UserIndex]:
+        """Iterate over all indices in the tensor."""
         lshape: Shape = array(self.shape)
         out_index: Index = array(self.shape)
         for i in range(self.size):
@@ -216,10 +246,12 @@ class TensorData:
         return tuple((random.randint(0, s - 1) for s in self.shape))
 
     def get(self, key: UserIndex) -> float:
+        """Get a value from the tensor."""
         x: float = self._storage[self.index(key)]
         return x
 
     def set(self, key: UserIndex, val: float) -> None:
+        """Set a value in the tensor."""
         self._storage[self.index(key)] = val
 
     def tuple(self) -> Tuple[Storage, Shape, Strides]:
@@ -237,13 +269,19 @@ class TensorData:
         -------
             New `TensorData` with the same storage and a new dimension order.
 
-        """
+        """   
         assert list(sorted(order)) == list(
             range(len(self.shape))
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
 
+
+        new_shape = tuple(self.shape[i] for i in order)
+        new_strides = tuple(self._strides[i] for i in order)
+        return TensorData(self._storage, new_shape, new_strides)
+
+
         # TODO: Implement for Task 2.1.
-        raise NotImplementedError("Need to implement for Task 2.1")
+        #raise NotImplementedError("Need to implement for Task 2.1")
 
     def to_string(self) -> str:
         """Convert to string"""
