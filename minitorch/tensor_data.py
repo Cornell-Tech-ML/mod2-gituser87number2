@@ -103,7 +103,6 @@ def broadcast_index(
         else:
             raise IndexingError(f"Cannot broadcast index {big_index} from shape {big_shape} to shape {shape}")
     # TODO: Implement for Task 2.2.
-    #raise NotImplementedError("Need to implement for Task 2.2")
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -179,7 +178,7 @@ class TensorData:
         self._shape = array(shape)
         self.strides = strides
         self.dims = len(strides)
-        self.size = int(prod(shape)) #wrong prod referenced?
+        self.size = int(prod(shape)) #wrong prod referenced? #TODO: check if prod is correct
         self.shape = shape
         assert len(self._storage) == self.size
 
@@ -280,7 +279,6 @@ class TensorData:
 
 
         # TODO: Implement for Task 2.1.
-        #raise NotImplementedError("Need to implement for Task 2.1")
 
     def to_string(self) -> str:
         """Convert to string"""

@@ -3,10 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional, Type
 
 from typing_extensions import Protocol
+import numpy as np
 
 from . import operators
 from .tensor_data import (
-    shape_broadcast,
+    broadcast_index, index_to_position, shape_broadcast, to_index
 )
 
 if TYPE_CHECKING:
@@ -200,6 +201,7 @@ class SimpleOps(TensorOps):
             fn: function from two floats-to-float to apply
             a (:class:`TensorData`): tensor to reduce over
             dim (int): int of dim to reduce
+            start: starting value for reduction
 
         Returns:
         -------
@@ -259,7 +261,6 @@ def tensor_map(
         Tensor map function.
 
     """
-
     def _map(
         out: Storage,
         out_shape: Shape,
@@ -267,9 +268,36 @@ def tensor_map(
         in_storage: Storage,
         in_shape: Shape,
         in_strides: Strides,
-    ) -> None:
+    ) -> None: 
+
+        if len(in_shape) > len(out_shape):
+            raise ValueError(
+                "in_shape must be smaller than or equal to out_shape. Actual: {} > {}".format(
+                    len(in_shape), len(out_shape)
+                )
+            )
+
+        # Get the total number of elements in out_shape by multiplying all dimensions
+        out_size = int(np.prod(out_shape))
+
+        # Initialize index arrays
+        out_index = np.zeros_like(out_shape)
+        in_index = np.zeros_like(in_shape)
+
+        for i in range(out_size):
+            # Broadcast index from out_shape to in_shape
+            to_index(i, out_shape, out_index)
+            broadcast_index(out_index, out_shape, in_shape, in_index)
+
+            # Get the position of the current index in the storage arrays
+            in_pos = index_to_position(in_index, in_strides)
+            out_pos = index_to_position(out_index, out_strides)
+
+            # Apply the function to the input value and store the result in the output array
+            out[out_pos] = fn(in_storage[in_pos])
+    
         # TODO: Implement for Task 2.3.
-        raise NotImplementedError("Need to implement for Task 2.3")
+        #raise NotImplementedError("Need to implement for Task 2.3")
 
     return _map
 
@@ -315,8 +343,31 @@ def tensor_zip(
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
+        
+            # Get the total number of elements in out_shape by multiplying all dimensions
+        out_size = int(np.prod(out_shape))
+
+        # Initialize index arrays
+        out_index = np.zeros_like(out_shape, dtype=np.int32)
+        a_index = np.zeros_like(a_shape, dtype=np.int32)
+        b_index = np.zeros_like(b_shape, dtype=np.int32)
+
+        for i in range(out_size):
+            # Broadcast index from out_shape to a_shape and b_shape
+            to_index(i, out_shape, out_index)
+            broadcast_index(out_index, out_shape, a_shape, a_index)
+            broadcast_index(out_index, out_shape, b_shape, b_index)
+
+            # Get the position of the current index in the storage arrays
+            a_pos = index_to_position(a_index, a_strides)
+            b_pos = index_to_position(b_index, b_strides)
+            out_pos = index_to_position(out_index, out_strides)
+
+            # Apply the function to the input values and store the result in the output array
+            out[out_pos] = fn(a_storage[a_pos], b_storage[b_pos])
+
         # TODO: Implement for Task 2.3.
-        raise NotImplementedError("Need to implement for Task 2.3")
+        #raise NotImplementedError("Need to implement for Task 2.3")
 
     return _zip
 
@@ -348,8 +399,45 @@ def tensor_reduce(
         a_strides: Strides,
         reduce_dim: int,
     ) -> None:
+        
+        # Get the total number of elements in out_shape by multiplying all dimensions
+        out_size = int(np.prod(out_shape))
+
+        # Initialize index arrays
+        out_index = np.zeros_like(out_shape)
+
+        for i in range(out_size):
+            # Get the index of the current element in the output array
+            to_index(i, out_shape, out_index)
+            assert out_index[reduce_dim] == 0
+
+            # Initialize the output value, that accumulates the reduction
+            out_val = 0.0
+
+            # Iterate over the elements of the dimension to reduce
+            for j in range(a_shape[reduce_dim]):
+                # Set the index of the dimension to reduce to the current element
+                a_index = np.copy(out_index)
+                a_index[reduce_dim] = j
+
+                # Get the position of the current index in the storage arrays
+                a_pos = index_to_position(a_index, a_strides)
+
+                # Initialize the output value with the first element of the dimension to reduce
+                if j == 0:
+                    out_val = a_storage[a_pos]
+
+                # Apply the function to the output value and the current element
+                else:
+                    out_val = fn(out_val, a_storage[a_pos])
+
+            # Store the output value in the output array
+            out_pos = index_to_position(out_index, out_strides)
+            out[out_pos] = out_val
+
+
         # TODO: Implement for Task 2.3.
-        raise NotImplementedError("Need to implement for Task 2.3")
+        #raise NotImplementedError("Need to implement for Task 2.3")
 
     return _reduce
 
