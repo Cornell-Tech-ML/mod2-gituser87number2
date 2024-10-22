@@ -1,7 +1,7 @@
 """Collection of the core mathematical operators used throughout the code base."""
 
 import math
-from typing import Callable
+from typing import Callable, Iterable
 
 
 # ## Task 0.1
@@ -218,27 +218,27 @@ def zipWith(func: Callable, list1: list[float], list2: list[float]) -> list[floa
 # - reduce
 
 
-def reduce(func: Callable, list1: list[float]) -> float:
-    """Higher-order function that reduces an iterable to a single value using a given function
+def reduce(func: Callable, input1: Iterable[float]) -> float:
+    """Higher-order function that reduces an iterable to a single value using a given function.
+        func (Callable): A function that takes two floats and returns a float.
+        input1 (Iterable[float]): An iterable of floats to be reduced.
 
-    Args:
-    ----
-        func: function
-        list1: list of floats
-
-        returns: list of floats
+    Returns
+    -------
+        float: The reduced single value.
 
     """
-    length = len(list1)
+    input1 = list(input1)
+    length = len(input1)
 
     if length == 1:
-        return list1[0]
+        return input1[0]
     elif length == 0:
         return 0.0
 
-    val: float = func(list1[0], list1[1])
+    val: float = func(input1[0], input1[1])
     for i in range(length - 2):
-        val = func(val, list1[i + 2])
+        val = func(val, input1[i + 2])
 
     return val
 
@@ -281,7 +281,7 @@ def addLists(list1: list[float], list2: list[float]) -> list[float]:
 # - sum: sum lists
 
 
-def sum(list1: list[float]) -> float:
+def sum(list1: Iterable[float]) -> float:
     """Adds each element in an iterable and computes a final result
 
     Args:
@@ -297,17 +297,17 @@ def sum(list1: list[float]) -> float:
 # - prod: take the product of lists
 
 
-def prod(list1: list[float]) -> float:
+def prod(input1: Iterable[float]) -> float:
     """Calculate the product of all elements in a list using reduce
 
     Args:
     ----
-    list1: list of floats
+    input1: Iterable of floats
 
-    returns: list of floats
+    returns: float
 
     """
-    return reduce(mul, list1)
+    return reduce(mul, input1)
 
 
 # TODO: Implement for Task 0.3.

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import random
-from re import X
 from typing import Iterable, Optional, Sequence, Tuple, Union
 
 import numba
@@ -11,7 +10,7 @@ import numpy.typing as npt
 from numpy import array, float64
 from typing_extensions import TypeAlias
 
-from .operators import prod
+from .operators import prod   #todo: check if prod is correct
 
 MAX_DIMS = 32
 
@@ -72,7 +71,7 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     for i in range(dim - 1, -1, -1):
         out_index[i] = ordinal % shape[i]
         ordinal //= shape[i]
-        #REVIEW MATH
+        #TO-DO REVIEW MATH
 
 def broadcast_index(
     big_index: Index, big_shape: Shape, shape: Shape, out_index: OutIndex
