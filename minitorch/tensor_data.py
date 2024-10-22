@@ -68,10 +68,9 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     """
     dim = len(shape)
 
-    for i in range(dim - 1, -1, -1):
+    for i in range(dim - 1, -1, -1):  # reverse the index
         out_index[i] = ordinal % shape[i]
         ordinal //= shape[i]
-        # TO-DO REVIEW MATH
 
 
 def broadcast_index(
@@ -95,12 +94,12 @@ def broadcast_index(
         None
 
     """
-    big_index = big_index[-len(shape) :]
+    big_index = big_index[-len(shape) :]  # reverse the index
     for i in range(len(shape)):
-        if shape[i] == 1:
+        if shape[i] == 1:  # broadcast
             out_index[i] = 0
         else:
-            out_index[i] = big_index[i]
+            out_index[i] = big_index[i]  # copy
 
     # TODO: Implement for Task 2.2.
 
@@ -129,11 +128,13 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     result_shape = []
 
     for i in range(max_len):
-        dim1, dim2 = shape1[i], shape2[i]
+        dim1, dim2 = shape1[i], shape2[i]  # same index
         if dim1 == dim2 or dim1 == 1 or dim2 == 1:
-            result_shape.append(max(dim1, dim2))
+            result_shape.append(max(dim1, dim2))  # max of 1 and the other
         else:
-            raise IndexingError(f"Shapes {shape1} and {shape2} cannot be broadcasted")
+            raise IndexingError(
+                f"Shapes {shape1} and {shape2} cannot be broadcasted"
+            )  # if neither is 1 and they are not equal
     return tuple(result_shape)
     # TODO: Implement for Task 2.2.
 

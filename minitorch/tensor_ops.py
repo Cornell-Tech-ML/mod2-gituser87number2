@@ -208,7 +208,7 @@ class SimpleOps(TensorOps):
         """
         f = tensor_reduce(fn)
 
-        def ret(a: "Tensor", dim: int) -> "Tensor":
+        def calc(a: "Tensor", dim: int) -> "Tensor":
             out_shape = list(a.shape)
             out_shape[dim] = 1
 
@@ -218,7 +218,7 @@ class SimpleOps(TensorOps):
             f(*out.tuple(), *a.tuple(), dim)
             return out
 
-        return ret
+        return calc
 
     @staticmethod
     def matrix_multiply(a: "Tensor", b: "Tensor") -> "Tensor":

@@ -140,7 +140,7 @@ class Sigmoid(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
-        """Derivative of the sigmoid function is sigmoid(x) * (1 - sigmoid(x)) * grad_output."""
+        """Derivative of the sigmoid function"""
         (sig,) = ctx.saved_values
         neg_sig = sig.f.neg_map(sig)
         return grad_output.f.mul_zip(
@@ -172,7 +172,7 @@ class Log(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
-        """Derivative of the log function is 1/x * grad_output."""
+        """Derivative of the log function is 1/x * grad_output"""
         (t1,) = ctx.saved_values
         return grad_output.f.log_back_zip(t1, grad_output)
 
@@ -187,7 +187,7 @@ class Exp(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
-        """Derivative of the exponential function is exp(x) * grad_output."""
+        """Derivative of the exponential function is exp(x) * grad_output"""
         (exp,) = ctx.saved_values
         return grad_output.f.mul_zip(exp, grad_output)
 
@@ -215,7 +215,7 @@ class LT(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
-        """Derivative of the less than function is 0."""
+        """Derivative of the less than function is 0"""
         a_shape, b_shape = ctx.saved_values
         return zeros(a_shape), zeros(b_shape)
 
@@ -229,7 +229,7 @@ class EQ(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
-        """Derivative of the equal function is 0."""
+        """Derivative of the equal function is 0"""
         a_shape, b_shape = ctx.saved_values
         return zeros(a_shape), zeros(b_shape)
 
@@ -245,7 +245,7 @@ class IsClose(Function):
 class Permute(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, order: Tensor) -> Tensor:
-        """Permute the dimensions of a tensor, given a new order."""
+        """Permute the dimensions of a tensor, given a new order"""
         int_order = [int(x) for x in order._tensor._storage]
         ctx.save_for_backward(int_order)
 
@@ -253,7 +253,7 @@ class Permute(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
-        """Permute the gradients back to the original order."""
+        """Permute the gradients back to the original order"""
         (new_order,) = ctx.saved_values
         original_order_map = {v: i for i, v in enumerate(new_order)}
         original_order = [original_order_map[i] for i in range(len(new_order))]
@@ -295,7 +295,7 @@ class Copy(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
-        """Undo"""
+        """Copy backward"""
         return grad_output
 
 
