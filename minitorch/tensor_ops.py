@@ -212,7 +212,6 @@ class SimpleOps(TensorOps):
             out_shape = list(a.shape)
             out_shape[dim] = 1
 
-            # Other values when not sum.
             out = a.zeros(tuple(out_shape))
             out._tensor._storage[:] = start
 
@@ -341,10 +340,10 @@ def tensor_zip(
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-        # Get the total number of elements in out_shape by multiplying all dimensions
+        # Get the total number of elements in out_shape
         out_size = int(np.prod(out_shape))
 
-        # Initialize index arrays
+        # Initialize indexs
         out_index = np.zeros_like(out_shape, dtype=np.int32)
         a_index = np.zeros_like(a_shape, dtype=np.int32)
         b_index = np.zeros_like(b_shape, dtype=np.int32)

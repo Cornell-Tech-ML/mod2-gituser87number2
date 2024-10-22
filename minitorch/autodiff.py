@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import defaultdict, deque
+
 from dataclasses import dataclass
 from typing import Any, Iterable, Tuple, Protocol
 
@@ -93,20 +95,48 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
         Non-constant Variables in topological order starting from the right.
 
     """
-    visited = {}
-    order = []
+    in_degree: dict[int, int] = defaultdict(int)
+    in_degree[variable.unique_id] = 0
 
-    def dfs(v: Variable) -> None:
-        """DFS Search method"""
-        if v not in visited:
-            visited[v] = True
-            for parent in v.parents:
-                dfs(parent)
-            order.append(v)
+    # Stack to keep track of nodes to visit, using doubly ended queue for O(1) pop and append
+    stack: deque[Variable] = deque([variable])
+    visited: set[int] = set([variable.unique_id])  # Keep track of visited nodes
+    result: list[Variable] = []  # List to store the topological order
 
-    dfs(variable)
+    while stack:
+        cur_var = stack.pop()
 
-    return reversed(order)
+        # Explore the parents of the current variable, counting the incoming edges
+        for var in cur_var.parents:
+            # Skip constant variables since they do not have derivatives
+            # Otherwise, increment the in-degree of the parent
+            if not var.is_constant():
+                in_degree[var.unique_id] += 1
+
+                # If the parent has not been visited, add it to the stack
+                if var.unique_id not in visited:
+                    stack.append(var)
+                    visited.add(var.unique_id)
+
+    # Reset the stack and add the variable to the stack
+    stack.append(variable)
+
+    # Second pass: Topological sorting using zero in-degree nodes
+    # Only add variable to the result when all its dependencies (i.e. parents) have been processed (in_degree = 0)
+    while stack:
+        cur_var = stack.pop()
+        result.append(cur_var)
+
+        for var in cur_var.parents:
+            # If the variable is not a constant, decrement the number of incoming edges because the parent will be visited
+            if not var.is_constant():
+                in_degree[var.unique_id] -= 1
+
+                # If the parent has zero incoming edges, add it to the stack to be visited
+                if in_degree[var.unique_id] == 0:
+                    stack.append(var)
+
+    return result
 
 
 def backpropagate(variable: Variable, deriv: Any) -> None:
