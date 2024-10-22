@@ -10,7 +10,7 @@ import numpy.typing as npt
 from numpy import array, float64
 from typing_extensions import TypeAlias
 
-from .operators import prod   #todo: check if prod is correct
+from .operators import prod  # todo: check if prod is correct
 
 MAX_DIMS = 32
 
@@ -71,7 +71,8 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     for i in range(dim - 1, -1, -1):
         out_index[i] = ordinal % shape[i]
         ordinal //= shape[i]
-        #TO-DO REVIEW MATH
+        # TO-DO REVIEW MATH
+
 
 def broadcast_index(
     big_index: Index, big_shape: Shape, shape: Shape, out_index: OutIndex
@@ -100,7 +101,9 @@ def broadcast_index(
         elif big_shape[i] == 1:
             out_index[i] = 0
         else:
-            raise IndexingError(f"Cannot broadcast index {big_index} from shape {big_shape} to shape {shape}")
+            raise IndexingError(
+                f"Cannot broadcast index {big_index} from shape {big_shape} to shape {shape}"
+            )
     # TODO: Implement for Task 2.2.
 
 
@@ -122,7 +125,7 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
 
     """
     max_len = max(len(shape1), len(shape2))
-    shape1 = (1,) * (max_len - len(shape1)) + tuple(shape1) #left pads w 1s
+    shape1 = (1,) * (max_len - len(shape1)) + tuple(shape1)  # left pads w 1s
     shape2 = (1,) * (max_len - len(shape2)) + tuple(shape2)
 
     result_shape = []
@@ -177,7 +180,9 @@ class TensorData:
         self._shape = array(shape)
         self.strides = strides
         self.dims = len(strides)
-        self.size = int(prod(shape)) #wrong prod referenced? #TODO: check if prod is correct
+        self.size = int(
+            prod(shape)
+        )  # wrong prod referenced? #TODO: check if prod is correct
         self.shape = shape
         assert len(self._storage) == self.size
 
@@ -266,16 +271,14 @@ class TensorData:
         -------
             New `TensorData` with the same storage and a new dimension order.
 
-        """   
+        """
         assert list(sorted(order)) == list(
             range(len(self.shape))
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
 
-
         new_shape = tuple(self.shape[i] for i in order)
         new_strides = tuple(self._strides[i] for i in order)
         return TensorData(self._storage, new_shape, new_strides)
-
 
         # TODO: Implement for Task 2.1.
 

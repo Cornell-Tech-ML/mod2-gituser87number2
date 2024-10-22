@@ -6,9 +6,7 @@ from typing_extensions import Protocol
 import numpy as np
 
 from . import operators
-from .tensor_data import (
-    broadcast_index, index_to_position, shape_broadcast, to_index
-)
+from .tensor_data import broadcast_index, index_to_position, shape_broadcast, to_index
 
 if TYPE_CHECKING:
     from .tensor import Tensor
@@ -261,6 +259,7 @@ def tensor_map(
         Tensor map function.
 
     """
+
     def _map(
         out: Storage,
         out_shape: Shape,
@@ -268,8 +267,7 @@ def tensor_map(
         in_storage: Storage,
         in_shape: Shape,
         in_strides: Strides,
-    ) -> None: 
-
+    ) -> None:
         if len(in_shape) > len(out_shape):
             raise ValueError(
                 "in_shape must be smaller than or equal to out_shape. Actual: {} > {}".format(
@@ -295,9 +293,9 @@ def tensor_map(
 
             # Apply the function to the input value and store the result in the output array
             out[out_pos] = fn(in_storage[in_pos])
-    
+
         # TODO: Implement for Task 2.3.
-        #raise NotImplementedError("Need to implement for Task 2.3")
+        # raise NotImplementedError("Need to implement for Task 2.3")
 
     return _map
 
@@ -343,8 +341,7 @@ def tensor_zip(
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-        
-            # Get the total number of elements in out_shape by multiplying all dimensions
+        # Get the total number of elements in out_shape by multiplying all dimensions
         out_size = int(np.prod(out_shape))
 
         # Initialize index arrays
@@ -367,7 +364,7 @@ def tensor_zip(
             out[out_pos] = fn(a_storage[a_pos], b_storage[b_pos])
 
         # TODO: Implement for Task 2.3.
-        #raise NotImplementedError("Need to implement for Task 2.3")
+        # raise NotImplementedError("Need to implement for Task 2.3")
 
     return _zip
 
@@ -399,7 +396,6 @@ def tensor_reduce(
         a_strides: Strides,
         reduce_dim: int,
     ) -> None:
-        
         # Get the total number of elements in out_shape by multiplying all dimensions
         out_size = int(np.prod(out_shape))
 
@@ -435,9 +431,8 @@ def tensor_reduce(
             out_pos = index_to_position(out_index, out_strides)
             out[out_pos] = out_val
 
-
         # TODO: Implement for Task 2.3.
-        #raise NotImplementedError("Need to implement for Task 2.3")
+        # raise NotImplementedError("Need to implement for Task 2.3")
 
     return _reduce
 

@@ -113,7 +113,6 @@ class All(Function):
             return a.f.mul_reduce(a.contiguous().view(int(operators.prod(a.shape))), 0)
 
 
-
 class Mul(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, b: Tensor) -> Tensor:
@@ -129,7 +128,6 @@ class Mul(Function):
             grad_output.f.mul_zip(grad_output, b),
             grad_output.f.mul_zip(a, grad_output),
         )
-
 
 
 class Sigmoid(Function):
@@ -206,7 +204,7 @@ class Sum(Function):
         """Sum backward with Dim"""
         _, _ = ctx.saved_values
         return grad_output, 0.0
-    
+
 
 class LT(Function):
     @staticmethod

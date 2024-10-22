@@ -197,6 +197,7 @@ class Tensor:
 
     def zeros(self, shape: Optional[UserShape] = None) -> Tensor:
         """Create a new zero tensor with the same shape as this tensor."""
+
         def zero(shape: UserShape) -> Tensor:
             return Tensor.make(
                 [0.0] * int(operators.prod(shape)), shape, backend=self.backend
@@ -236,7 +237,6 @@ class Tensor:
                 backend=self.backend,
             )
         self.grad += x
-
 
     def zero_grad_(self) -> None:  # pragma: no cover
         """Reset the derivative on this variable."""
@@ -296,7 +296,6 @@ class Tensor:
     def size(self) -> int:
         """Returns: size of the tensor(int)"""
         return self._tensor.size
-    
 
     @property
     def dims(self) -> int:
@@ -305,7 +304,6 @@ class Tensor:
 
     # Functions
     # TODO: Implement for Task 2.3.
-
 
     def __add__(self, b: TensorLike) -> Tensor:
         return Add.apply(self, self._ensure_tensor(b))
@@ -330,7 +328,7 @@ class Tensor:
 
     def __radd__(self, b: TensorLike) -> Tensor:
         return self + b
-    
+
     def __rmul__(self, b: TensorLike) -> Tensor:
         return self * b
 
@@ -361,7 +359,6 @@ class Tensor:
         """Exp activation function"""
         return Exp.apply(self)
 
-    
     def sum(self, dim: Optional[int] = None) -> Tensor:
         """Compute the sum over dimension `dim`"""
         if dim is None:
