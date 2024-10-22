@@ -95,15 +95,13 @@ def broadcast_index(
         None
 
     """
+    big_index = big_index[-len(shape) :]
     for i in range(len(shape)):
-        if big_shape[i] == shape[i]:
-            out_index[i] = big_index[i]
-        elif big_shape[i] == 1:
+        if shape[i] == 1:
             out_index[i] = 0
         else:
-            raise IndexingError(
-                f"Cannot broadcast index {big_index} from shape {big_shape} to shape {shape}"
-            )
+            out_index[i] = big_index[i]
+
     # TODO: Implement for Task 2.2.
 
 
